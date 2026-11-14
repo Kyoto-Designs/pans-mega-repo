@@ -103,7 +103,7 @@
     },
     {
       "name": "Spotify",
-      "bundleIdentifier": "com.vitrine.client",
+      "bundleIdentifier": "com.spotify.client",
       "developerName": "",
       "subtitle": "",
       "localizedDescription": "",
@@ -117,29 +117,6 @@
           "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/1254-Spotify.9.1.90.Vitrine%2BPixie.%40ipavault.ipa",
           "size": 130776379,
           "minOSVersion": "16.1"
-        }
-      ],
-      "appPermissions": {
-        "entitlements": [],
-        "privacy": {}
-      }
-    },
-    {
-      "name": "Spotify",
-      "bundleIdentifier": "com.spotify.client",
-      "developerName": "",
-      "subtitle": "",
-      "localizedDescription": "",
-      "iconURL": "https://github.com/Kyoto-Designs/pans-mega-repo/blob/main/assets/IMG_9819.png?raw=true",
-      "tintColor": "#38bdf8",
-      "versions": [
-        {
-          "version": "9.1.92",
-          "date": "2026-11-14",
-          "localizedDescription": "",
-          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/Spotify.9.1.92.EeveeSpotify%2BPixie.No.Plugins.ipa",
-          "size": 146362211,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
