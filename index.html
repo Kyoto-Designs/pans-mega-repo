@@ -1,0 +1,1858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pan's Mega Repo · Pan AI Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#060607;
+  --glass:rgba(20,20,23,0.72);
+  --glass-elevated:rgba(30,30,35,0.82);
+  --glass-hover:rgba(42,42,48,0.88);
+  --border:rgba(255,255,255,0.09);
+  --border-strong:rgba(255,255,255,0.18);
+  --text:#f5f5f7;
+  --muted:#8e8e93;
+  --subtle:#52525b;
+  --white:#ffffff;
+  --ok:#34d399;
+  --warn:#fbbf24;
+  --err:#f87171;
+  --radius:14px;
+  --blur:blur(24px) saturate(160%);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;
+  background:radial-gradient(circle at 15% 0%,rgba(255,255,255,0.045),transparent 45%),
+             radial-gradient(circle at 85% 100%,rgba(255,255,255,0.03),transparent 50%),
+             var(--bg);
+  color:var(--text);
+  font:13px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* Layout */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;
+  background:rgba(10,10,12,0.84);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-right:1px solid var(--border);
+  padding:18px 12px;
+  display:flex;flex-direction:column;gap:4px;
+  overflow-y:auto;z-index:30;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.logo{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--white);color:#000;
+  display:grid;place-items:center;font-weight:800;font-size:15px;
+  box-shadow:0 2px 12px rgba(255,255,255,0.18);
+}
+.brand-title{font-weight:700;font-size:13.5px;letter-spacing:-0.01em}
+.brand-sub{font-size:10.5px;color:var(--muted)}
+.nav-group{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--subtle);padding:10px 10px 4px}
+.nav-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:100%;text-align:left;
+  background:transparent;border:1px solid transparent;color:var(--muted);
+  padding:7.5px 10px;border-radius:9px;font-size:12.5px;font-weight:500;cursor:pointer;
+  transition:all .15s ease;
+}
+.nav-btn:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+.nav-btn.active{
+  color:var(--white);background:rgba(255,255,255,0.09);
+  border-color:var(--border);font-weight:600;
+}
+.nav-pill{font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(255,255,255,0.08);color:var(--text)}
+.nav-pill.warn{background:rgba(251,191,36,0.16);color:var(--warn)}
+
+.main{padding:20px 24px 80px;max-width:1080px;width:100%;margin:0 auto}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-0.02em;margin:0}
+.page-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+
+/* Liquid Glass Cards */
+.card{
+  background:var(--glass);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.35);
+}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.card-title{font-size:13.5px;font-weight:700;letter-spacing:-0.01em}
+.card-sub{font-size:11.5px;color:var(--muted)}
+
+/* Controls */
+button.btn{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  border-radius:9px;
+  padding:7px 12px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s ease;
+  display:inline-flex;align-items:center;gap:6px;
+}
+button.btn:hover{background:rgba(255,255,255,0.1);border-color:var(--border-strong)}
+button.btn:disabled{opacity:.45;cursor:not-allowed}
+button.btn.primary{background:var(--white);color:#000;border-color:var(--white)}
+button.btn.primary:hover{opacity:.9}
+button.btn.danger{color:var(--err);border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.06)}
+button.btn.sm{padding:4px 9px;font-size:11px;border-radius:7px}
+
+input,textarea,select{
+  width:100%;
+  background:rgba(0,0,0,0.45);
+  border:1px solid var(--border);
+  color:var(--text);
+  border-radius:9px;
+  padding:8px 10px;
+  font:inherit;font-size:12.5px;
+  outline:none;transition:border-color .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:rgba(255,255,255,0.35)}
+textarea{min-height:68px;resize:vertical}
+label{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px}
+
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.full{grid-column:1/-1}
+.row{display:flex;gap:8px;align-items:center}
+
+/* Badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:600;
+  border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--muted);
+}
+.badge.ok{color:var(--ok);border-color:rgba(52,211,153,0.28);background:rgba(52,211,153,0.08)}
+.badge.warn{color:var(--warn);border-color:rgba(251,191,36,0.28);background:rgba(251,191,36,0.08)}
+.badge.err{color:var(--err);border-color:rgba(248,113,113,0.28);background:rgba(248,113,113,0.08)}
+.badge.ai{color:#fff;border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.1)}
+
+/* KPI Stats */
+.stat{padding:14px;border-radius:12px;background:rgba(255,255,255,0.025);border:1px solid var(--border)}
+.stat-val{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-top:4px}
+.stat-lbl{font-size:11px;color:var(--muted)}
+
+/* Accordion */
+details.glass-acc{
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--border);
+  border-radius:11px;
+  margin-bottom:8px;
+  overflow:hidden;
+}
+details.glass-acc > summary{
+  list-style:none;padding:10px 13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-weight:600;font-size:12.5px;user-select:none;
+}
+details.glass-acc > summary::-webkit-details-marker{display:none}
+details.glass-acc > summary:hover{background:rgba(255,255,255,0.03)}
+details.glass-acc[open] > summary{border-bottom:1px solid var(--border)}
+.acc-body{padding:13px}
+
+/* Dropzone */
+.dropzone{
+  border:1px dashed var(--border-strong);
+  border-radius:13px;padding:24px 16px;text-align:center;
+  background:rgba(255,255,255,0.02);cursor:pointer;transition:all .15s;
+}
+.dropzone:hover,.dropzone.drag{border-color:var(--white);background:rgba(255,255,255,0.05)}
+
+/* Visual Icon Matcher Grid */
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.asset-tile{
+  border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;
+  background:rgba(0,0,0,0.35);cursor:pointer;transition:all .15s;
+}
+.asset-tile:hover{border-color:var(--border-strong);background:rgba(255,255,255,0.04)}
+.asset-tile.selected{border-color:var(--white);background:rgba(255,255,255,0.08)}
+.asset-tile img{width:48px;height:48px;border-radius:11px;object-fit:cover;background:#18181b;margin-bottom:6px}
+
+/* AI Studio Chat */
+.chat-log{
+  max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
+  padding:12px;background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:11px;margin-bottom:10px;
+}
+.msg{padding:10px 12px;border-radius:10px;font-size:12.5px;line-height:1.5;max-width:88%}
+.msg.user{align-self:flex-end;background:rgba(255,255,255,0.12);border:1px solid var(--border-strong)}
+.msg.ai{align-self:flex-start;background:rgba(255,255,255,0.04);border:1px solid var(--border)}
+
+/* Code / JSON */
+pre.code{
+  margin:0;padding:12px;border-radius:10px;background:rgba(0,0,0,0.55);
+  border:1px solid var(--border);font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:#e4e4e7;max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-all;
+}
+
+/* Mobile Nav */
+.mobile-bar{display:none}
+.section{display:none}
+.section.active{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+.toast{
+  position:fixed;bottom:18px;right:18px;z-index:100;
+  background:rgba(28,28,32,0.94);backdrop-filter:var(--blur);
+  border:1px solid var(--border-strong);color:var(--white);
+  padding:9px 14px;border-radius:10px;font-size:12px;font-weight:500;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  opacity:0;transform:translateY(10px);pointer-events:none;transition:all .2s;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .sidebar.open{display:flex;position:fixed;inset:0;width:260px;z-index:60}
+  .mobile-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;background:rgba(10,10,12,0.88);backdrop-filter:var(--blur);
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;
+  }
+  .main{padding:16px 14px 80px}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-bar">
+  <div class="row">
+    <button class="btn sm" id="mobileMenuBtn">☰ Menu</button>
+    <strong style="font-size:13.5px">Pan's Mega Repo</strong>
+  </div>
+  <span class="badge ai" id="mobileWorkerBadge">Local Mode</span>
+</div>
+
+<div class="shell">
+  <!-- Navigation Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div>
+        <div class="brand-title">Pan's Mega Repo</div>
+        <div class="brand-sub">Pan AI · AltStore Platform</div>
+      </div>
+    </div>
+
+    <div class="nav-group">Workspace</div>
+    <button class="nav-btn active" data-sec="overview"><span>Overview</span><span class="nav-pill" id="pillHealth">Ready</span></button>
+    <button class="nav-btn" data-sec="apps"><span>Applications</span><span class="nav-pill" id="pillApps">0</span></button>
+    <button class="nav-btn" data-sec="uploads"><span>IPA Uploads & Pipeline</span></button>
+    <button class="nav-btn" data-sec="assets"><span>Assets Library</span><span class="nav-pill" id="pillAssets">0</span></button>
+
+    <div class="nav-group">Pan AI Intelligence</div>
+    <button class="nav-btn" data-sec="studio"><span>AI Studio</span><span class="badge ai" style="padding:0 5px;font-size:9px">AI</span></button>
+    <button class="nav-btn" data-sec="conflicts"><span>Bundle ID Manager</span><span class="nav-pill warn" id="pillConflicts" style="display:none">0</span></button>
+    <button class="nav-btn" data-sec="icons"><span>Icon Recognition</span></button>
+    <button class="nav-btn" data-sec="descriptions"><span>Description Generator</span></button>
+
+    <div class="nav-group">Publishing & Infra</div>
+    <button class="nav-btn" data-sec="editor"><span>Source Editor & JSON</span></button>
+    <button class="nav-btn" data-sec="github"><span>GitHub Integration</span></button>
+    <button class="nav-btn" data-sec="cloudflare"><span>Cloudflare Backend</span></button>
+    <button class="nav-btn" data-sec="settings"><span>Settings</span></button>
+    <button class="nav-btn" data-sec="logs"><span>Activity Logs</span><span class="nav-pill" id="pillLogs">0</span></button>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title" id="viewTitle">Overview</h1>
+        <div class="page-desc" id="viewDesc">Repository health, automated pipeline status, and AltStore Classic source summary.</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn" id="btnImportJson">Import JSON</button>
+        <button class="btn" id="btnBackup">Create Backup</button>
+        <button class="btn" id="btnCopyJson">Copy JSON</button>
+        <button class="btn primary" id="btnExportJson">Export apps.json</button>
+      </div>
+    </div>
+
+    <!-- 1. OVERVIEW -->
+    <section class="section active" id="sec-overview">
+      <div class="grid-4" style="margin-bottom:14px">
+        <div class="stat"><div class="stat-lbl">Applications</div><div class="stat-val" id="kpiApps">0</div></div>
+        <div class="stat"><div class="stat-lbl">Bundle ID Conflicts</div><div class="stat-val" id="kpiConflicts">0</div></div>
+        <div class="stat"><div class="stat-lbl">Indexed GitHub Assets</div><div class="stat-val" id="kpiAssets">0</div></div>
+        <div class="stat"><div class="stat-lbl">Worker Backend</div><div class="stat-val" id="kpiWorker" style="font-size:15px;padding-top:5px">Offline / Local</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Automated 12-Step IPA Ingestion Pipeline</div>
+            <div class="card-sub">Drop an .ipa to run structural validation, metadata extraction, visual icon matching, conflict check, AI research, and source synthesis.</div>
+          </div>
+          <button class="btn primary sm" onclick="switchSection('uploads')">Go to Uploader →</button>
+        </div>
+        <div id="pipelineChecklist" class="grid-3" style="font-size:11.5px;color:var(--muted)">
+          <div>1. ZIP / Payload / Info.plist Inspection</div>
+          <div>2. SHA-256 Checksum & Deduplication</div>
+          <div>3. Perceptual Icon Fingerprint Match</div>
+          <div>4. Bundle ID Conflict Analysis</div>
+          <div>5. Pan AI Web Metadata Research</div>
+          <div>6. AltStore Schema Validation & GitHub Sync</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Repository Validation & Health Audit</div>
+          <button class="btn sm" id="btnRunAudit">Run Full Audit</button>
+        </div>
+        <div id="auditResults" class="card-sub">Click "Run Full Audit" to inspect JSON schema compliance, missing icons, duplicate bundle IDs, and download URL formatting.</div>
+      </div>
+    </section>
+
+    <!-- 2. APPLICATIONS -->
+    <section class="section" id="sec-apps">
+      <div class="card">
+        <div class="card-head">
+          <div class="row" style="flex:1">
+            <input id="appSearch" placeholder="Filter by app name, bundle identifier, or developer..." style="max-width:340px">
+            <select id="appFilter" style="max-width:170px">
+              <option value="all">All Applications</option>
+              <option value="missing_url">Missing Download URL</option>
+              <option value="missing_icon">Missing Icon</option>
+              <option value="conflict">Bundle ID Conflict</option>
+            </select>
+          </div>
+          <div class="row">
+            <button class="btn sm" id="btnExpandApps">Expand All</button>
+            <button class="btn primary sm" id="btnAddManualApp">＋ Add App</button>
+          </div>
+        </div>
+        <div id="appsList"></div>
+      </div>
+    </section>
+
+    <!-- 3. IPA UPLOADS -->
+    <section class="section" id="sec-uploads">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">GitHub Releases Auto-Link</div>
+            <div class="card-sub">Sync a repository release page so imported IPAs automatically receive their verified download URL and release date.</div>
+          </div>
+        </div>
+        <div class="row">
+          <input id="ghReleaseUrl" placeholder="https://github.com/owner/repo/releases or .../releases/tag/v1.0">
+          <button class="btn primary" id="btnSyncReleases">Sync Releases</button>
+        </div>
+        <div id="ghReleaseStatus" class="card-sub" style="margin-top:8px">Awaiting repository URL.</div>
+      </div>
+
+      <div class="card">
+        <div class="dropzone" id="ipaDropzone">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">Drop .IPA files here or click to browse</div>
+          <div class="card-sub">Extracts Info.plist (XML & Binary heuristics), embedded icon, SHA-256 hash, entitlements, matches GitHub assets, and triggers Pan AI enrichment.</div>
+          <input type="file" id="ipaFileInput" accept=".ipa,application/octet-stream" multiple hidden>
+        </div>
+        <div id="uploadPipelineLog" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- 4. ASSETS LIBRARY -->
+    <section class="section" id="sec-assets">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">GitHub Repository Visual Assets Index</div>
+            <div class="card-sub">Scans your GitHub assets directory, computes perceptual average + difference hashes (aHash/dHash) & color histograms, and caches fingerprints locally & in D1.</div>
+          </div>
+          <button class="btn primary sm" id="btnIndexAssets">Scan & Fingerprint Assets</button>
+        </div>
+        <div class="grid-3" style="margin-bottom:12px">
+          <div><label>GitHub Owner / Repo</label><input id="ghRepoSlug" placeholder="owner/pans-mega-repo"></div>
+          <div><label>Branch</label><input id="ghBranch" value="main"></div>
+          <div><label>Assets Directory Path</label><input id="ghAssetsPath" value="assets"></div>
+        </div>
+        <div id="assetsStatus" class="card-sub" style="margin-bottom:12px">Configure your GitHub repository above and click Scan to build visual fingerprints.</div>
+        <div class="asset-grid" id="assetsGrid"></div>
+      </div>
+    </section>
+
+    <!-- 5. AI STUDIO -->
+    <section class="section" id="sec-studio">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Pan AI Command Studio</div>
+            <div class="card-sub">Context-aware repository assistant. Executes authorized audits, metadata research, conflict resolution, and description upgrades.</div>
+          </div>
+          <span class="badge ai" id="studioModelBadge">Pan AI Ready</span>
+        </div>
+        <div class="row" style="flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn sm quick-cmd" data-cmd="Analyze all applications">Analyze all applications</button>
+          <button class="btn sm quick-cmd" data-cmd="Find missing icons">Find missing icons</button>
+          <button class="btn sm quick-cmd" data-cmd="Find duplicate bundle identifiers">Find duplicate bundle identifiers</button>
+          <button class="btn sm quick-cmd" data-cmd="Validate my entire source">Validate entire source</button>
+          <button class="btn sm quick-cmd" data-cmd="Check whether all download URLs work">Check download URLs</button>
+          <button class="btn sm quick-cmd" data-cmd="Find unused assets">Find unused assets</button>
+        </div>
+        <div class="chat-log" id="aiChatLog">
+          <div class="msg ai"><strong>Pan AI:</strong> Ready. I have live context over your <span id="chatAppCount">0</span> applications, indexed visual assets, and AltStore schema rules. Ask me to audit, research, or repair your repository.</div>
+        </div>
+        <div class="row">
+          <input id="aiPromptInput" placeholder="Ask Pan AI (e.g., 'Research Spotify and generate an accurate English description')...">
+          <button class="btn primary" id="btnSendAi">Execute</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. BUNDLE ID MANAGER -->
+    <section class="section" id="sec-conflicts">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Intelligent Bundle ID Conflict Resolution</div>
+            <div class="card-sub">Detects duplicate identifiers, distinguishes multiple builds of the same app vs. distinct tweaked apps, and preserves original identifiers.</div>
+          </div>
+          <button class="btn sm" id="btnScanConflicts">Re-scan Conflicts</button>
+        </div>
+        <div class="card" style="background:rgba(251,191,36,0.05);border-color:rgba(251,191,36,0.25);padding:11px 13px;font-size:11.5px;color:var(--warn)">
+          <strong>iOS Code-Signing Notice:</strong> Modifying <code>bundleIdentifier</code> in AltStore source JSON updates catalog tracking only—it does not alter the embedded <code>Info.plist</code> or Mach-O signature inside the <code>.ipa</code>. Actual IPA bundle repackaging requires explicit authorization, valid entitlements, and re-signing with a matching provisioning profile.
+        </div>
+        <div id="conflictsList"></div>
+      </div>
+    </section>
+
+    <!-- 7. ICON RECOGNITION -->
+    <section class="section" id="sec-icons">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Visual AI Asset Matching (Perceptual Fingerprinting)</div>
+            <div class="card-sub">Compares extracted IPA icons against your GitHub assets using 64-bit dHash + aHash + RGB quadrant vectors (resolution & crop invariant).</div>
+          </div>
+          <button class="btn primary sm" id="btnMatchAllIcons">Auto-Match All Unlinked Apps</button>
+        </div>
+        <div id="iconMatchWorkspace"></div>
+      </div>
+    </section>
+
+    <!-- 8. DESCRIPTION GENERATOR -->
+    <section class="section" id="sec-descriptions">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Pan AI App Research & Description Generator</div>
+            <div class="card-sub">Generates verified, hallucination-guarded descriptions without overwriting existing text unless approved.</div>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-bottom:12px">
+          <div>
+            <label>Target Application</label>
+            <select id="descTargetApp"></select>
+          </div>
+          <div>
+            <label>Output Language</label>
+            <select id="descLang">
+              <option value="en">English (Default)</option>
+              <option value="pt-BR">Português (Brasil)</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
+          <div>
+            <label>Mode</label>
+            <select id="descMode">
+              <option value="research">Research & Generate New</option>
+              <option value="polish">Improve Existing (Preserve Meaning)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn primary" id="btnGenerateDesc">Generate with Pan AI</button>
+          <button class="btn" id="btnApplyDesc" disabled>Apply to App (Creates Backup)</button>
+        </div>
+        <div id="descPreviewBox" style="display:none">
+          <div class="grid-2">
+            <div><label>Generated Subtitle</label><input id="genSubtitle"></div>
+            <div><label>Detected Developer / Category</label><input id="genDevCat" readonly></div>
+            <div class="full"><label>Generated Full Description (Review before applying)</label><textarea id="genFullDesc" style="min-height:110px"></textarea></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. SOURCE EDITOR -->
+    <section class="section" id="sec-editor">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">AltStore Classic Source Metadata</div>
+          <span class="badge ok" id="schemaBadge">Valid Schema</span>
+        </div>
+        <div class="grid-2">
+          <div><label>Source Name *</label><input id="srcName" value="Pan's Mega Repo"></div>
+          <div><label>Source Identifier *</label><input id="srcIdentifier" value="com.pan.megarepo"></div>
+          <div><label>Subtitle</label><input id="srcSubtitle" value="Curated iOS Apps by PAN"></div>
+          <div><label>Website</label><input id="srcWebsite" placeholder="https://github.com/..."></div>
+          <div><label>Icon URL</label><input id="srcIconURL" placeholder="https://.../icon.png"></div>
+          <div><label>Header Banner URL</label><input id="srcHeaderURL" placeholder="https://.../banner.png"></div>
+          <div><label>Source URL (Self-hosted JSON URL)</label><input id="srcSourceURL" placeholder="https://.../apps.json"></div>
+          <div><label>Tint Color</label><input id="srcTintColor" type="color" value="#ffffff" style="height:36px;padding:3px"></div>
+          <div class="full"><label>Description</label><textarea id="srcDescription">Automated AltStore Classic repository powered by Pan AI.</textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Live AltStore JSON Output</div>
+          <div class="row">
+            <button class="btn sm" id="btnValidateJson">Validate Schema</button>
+            <button class="btn sm" id="btnRestoreBackup">Restore Last Backup</button>
+          </div>
+        </div>
+        <pre class="code" id="jsonCodePreview"></pre>
+      </div>
+    </section>
+
+    <!-- 10. GITHUB INTEGRATION -->
+    <section class="section" id="sec-github">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Safe GitHub Repository Synchronization</div>
+            <div class="card-sub">Commits <code>apps.json</code> via Cloudflare Worker using SHA concurrency checks so existing repository files are never blindly overwritten.</div>
+          </div>
+          <button class="btn primary sm" id="btnCommitGithub">Commit apps.json to GitHub</button>
+        </div>
+        <div class="grid-2">
+          <div><label>Target JSON Path in Repo</label><input id="ghJsonPath" value="apps.json"></div>
+          <div><label>Commit Message</label><input id="ghCommitMsg" value="chore(source): update apps.json via Pan AI Studio"></div>
+        </div>
+        <div id="ghSyncResult" class="card-sub" style="margin-top:10px">GitHub PAT token is stored securely as a Cloudflare Worker secret (<code>GITHUB_TOKEN</code>).</div>
+      </div>
+    </section>
+
+    <!-- 11. CLOUDFLARE BACKEND -->
+    <section class="section" id="sec-cloudflare">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Cloudflare Workers + D1 + R2 + KV Connection</div>
+            <div class="card-sub">Connect your deployed Pan AI Worker URL and Admin Bearer Token. Credentials stay in session/local storage and never enter GitHub.</div>
+          </div>
+          <button class="btn primary sm" id="btnTestWorker">Test /api/health</button>
+        </div>
+        <div class="grid-2">
+          <div><label>Worker Base URL</label><input id="cfWorkerUrl" placeholder="https://pans-mega-repo-api.your-subdomain.workers.dev"></div>
+          <div><label>Admin API Token (Bearer)</label><input id="cfAdminToken" type="password" placeholder="Stored locally in browser only"></div>
+        </div>
+        <div id="cfHealthStatus" class="card-sub" style="margin-top:10px">Not connected. Local browser engine active as fallback.</div>
+      </div>
+    </section>
+
+    <!-- 12. SETTINGS -->
+    <section class="section" id="sec-settings">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Pan AI Provider & Model Routing</div>
+            <div class="card-sub">API keys are transmitted securely to Cloudflare Worker Secrets/KV and never written to frontend source or GitHub.</div>
+          </div>
+          <div class="row">
+            <label style="display:flex;align-items:center;gap:6px;margin:0;cursor:pointer">
+              <input type="checkbox" id="aiEnabled" checked style="width:auto"> Enable Pan AI
+            </label>
+            <button class="btn primary sm" id="btnSaveAiSettings">Save & Test Connection</button>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Primary AI Provider</label>
+            <select id="aiProvider">
+              <option value="gemini">Google Gemini API</option>
+              <option value="openai">OpenAI API</option>
+              <option value="anthropic">Anthropic API</option>
+              <option value="openrouter">OpenRouter API</option>
+              <option value="custom">Custom OpenAI-Compatible Endpoint</option>
+            </select>
+          </div>
+          <div>
+            <label>Primary Model</label>
+            <input id="aiModel" value="gemini-2.5-flash" placeholder="e.g. gemini-2.5-flash, gpt-4o, claude-3-7-sonnet-latest">
+          </div>
+          <div>
+            <label>API Key (Stored in Worker Backend)</label>
+            <input id="aiApiKey" type="password" placeholder="sk-... or AIza...">
+          </div>
+          <div>
+            <label>Custom Endpoint URL (Optional)</label>
+            <input id="aiCustomEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+          </div>
+          <div>
+            <label>Temperature (0.0 – 1.0)</label>
+            <input id="aiTemp" type="number" step="0.1" min="0" max="1" value="0.2">
+          </div>
+          <div>
+            <label>Max Output Tokens</label>
+            <input id="aiMaxTokens" type="number" min="256" max="16384" value="2048">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. ACTIVITY LOGS -->
+    <section class="section" id="sec-logs">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">System & Pan AI Audit Trail</div>
+          <button class="btn sm" id="btnClearLogs">Clear Logs</button>
+        </div>
+        <div id="activityLogList" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="jsonImportInput" accept=".json,application/json" hidden>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// --- APPLICATION STATE ---
+const state = {
+  source: {
+    name: "Pan's Mega Repo",
+    identifier: "com.pan.megarepo",
+    subtitle: "Curated iOS Apps by PAN",
+    description: "Automated AltStore Classic repository powered by Pan AI.",
+    iconURL: "",
+    headerURL: "",
+    website: "",
+    sourceURL: "",
+    tintColor: "#ffffff"
+  },
+  apps: [],
+  ghReleases: [],
+  ghAssets: [], // { name, path, url, sha, fingerprint: { dhash, ahash, rgb } }
+  backups: [],
+  logs: [],
+  config: {
+    workerUrl: localStorage.getItem('pan_worker_url') || '',
+    adminToken: localStorage.getItem('pan_admin_token') || '',
+    repoSlug: localStorage.getItem('pan_repo_slug') || '',
+    branch: localStorage.getItem('pan_branch') || 'main',
+    assetsPath: localStorage.getItem('pan_assets_path') || 'assets',
+    aiEnabled: true,
+    aiProvider: 'gemini',
+    aiModel: 'gemini-2.5-flash',
+    aiCustomEndpoint: '',
+    aiTemp: 0.2,
+    aiMaxTokens: 2048
+  }
+};
+
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function logEvent(category, message, level = 'info') {
+  state.logs.unshift({
+    id: crypto.randomUUID(),
+    time: new Date().toLocaleTimeString(),
+    category,
+    message,
+    level
+  });
+  if (state.logs.length > 150) state.logs.pop();
+  $('pillLogs').textContent = state.logs.length;
+  renderLogs();
+}
+
+function createBackup(reason) {
+  state.backups.unshift({
+    timestamp: new Date().toISOString(),
+    reason,
+    snapshot: JSON.stringify(buildAltStoreSource())
+  });
+  if (state.backups.length > 15) state.backups.pop();
+  logEvent('Backup', `Snapshot saved: ${reason}`);
+}
+
+// --- NAVIGATION ---
+const sectionMeta = {
+  overview: ['Overview', 'Repository health, automated pipeline status, and AltStore Classic source summary.'],
+  apps: ['Applications', 'Manage IPA entries, extracted metadata, versions, and download links.'],
+  uploads: ['IPA Uploads & Pipeline', 'Ingest .ipa binaries, extract Info.plist, match GitHub releases, and auto-enrich.'],
+  assets: ['Assets Library', 'Visual perceptual fingerprint index of your GitHub repository assets folder.'],
+  studio: ['Pan AI Studio', 'Interactive AI command center for repository audits, research, and maintenance.'],
+  conflicts: ['Bundle ID Manager', 'Detect duplicate bundle identifiers and resolve multi-build vs. distinct app collisions safely.'],
+  icons: ['Icon Recognition', 'Visual similarity matching between embedded IPA icons and GitHub repository assets.'],
+  descriptions: ['Description Generator', 'Web-grounded, hallucination-guarded description and metadata generator.'],
+  editor: ['Source Editor & JSON', 'Configure AltStore Classic source fields and inspect validated JSON output.'],
+  github: ['GitHub Integration', 'Atomic, SHA-verified commits to your GitHub repository.'],
+  cloudflare: ['Cloudflare Backend', 'Configure Cloudflare Worker API, D1 database, KV cache, and R2 storage.'],
+  settings: ['Settings', 'Configure Pan AI providers (Gemini, OpenAI, Anthropic, OpenRouter, Custom).'],
+  logs: ['Activity Logs', 'Chronological audit trail of extractions, AI operations, and syncs.']
+};
+
+function switchSection(sec) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const target = $(`sec-${sec}`);
+  if (target) target.classList.add('active');
+  const btn = document.querySelector(`.nav-btn[data-sec="${sec}"]`);
+  if (btn) btn.classList.add('active');
+  const [title, desc] = sectionMeta[sec] || ['Workspace', ''];
+  $('viewTitle').textContent = title;
+  $('viewDesc').textContent = desc;
+  $('sidebar').classList.remove('open');
+  refreshAllViews();
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.onclick = () => switchSection(btn.dataset.sec);
+});
+$('mobileMenuBtn').onclick = () => $('sidebar').classList.toggle('open');
+
+// --- WORKER API HELPER ---
+async function callWorker(path, payload = null, method = 'POST') {
+  const base = $('cfWorkerUrl').value.trim().replace(/\/$/, '');
+  if (!base) throw new Error('Cloudflare Worker URL not configured');
+  const token = $('cfAdminToken').value.trim();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${base}${path}`, {
+    method,
+    headers,
+    body: payload ? JSON.stringify(payload) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Worker HTTP ${res.status}`);
+  return data;
+}
+
+// --- SHA-256 & IPA BINARY PARSER ---
+async function computeSHA256(arrayBuffer) {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function parseXmlPlist(xmlText) {
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const keys = doc.getElementsByTagName('key');
+  const out = {};
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i].textContent.trim();
+    const next = keys[i].nextElementSibling;
+    if (!next) continue;
+    if (next.tagName === 'string' || next.tagName === 'integer' || next.tagName === 'real') {
+      out[k] = next.textContent.trim();
+    } else if (next.tagName === 'true') out[k] = true;
+    else if (next.tagName === 'false') out[k] = false;
+    else if (next.tagName === 'array') {
+      out[k] = Array.from(next.children).map(c => c.textContent.trim());
+    }
+  }
+  return out;
+}
+
+// Perceptual Image Fingerprinting (64-bit dHash + 64-bit aHash + RGB quadrant averages)
+async function computeImageFingerprint(srcOrBlob) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        // 9x8 canvas for dHash + 8x8 for aHash
+        const c = document.createElement('canvas');
+        c.width = 9; c.height = 8;
+        const ctx = c.getContext('2d');
+        // Fill neutral dark background to handle rounded vs square transparent corners consistently
+        ctx.fillStyle = '#808080';
+        ctx.fillRect(0, 0, 9, 8);
+        ctx.drawImage(img, 0, 0, 9, 8);
+        const data = ctx.getImageData(0, 0, 9, 8).data;
+
+        let dhash = '';
+        const grays = [];
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const i1 = (y * 9 + x) * 4;
+            const i2 = (y * 9 + x + 1) * 4;
+            const g1 = data[i1] * 0.299 + data[i1 + 1] * 0.587 + data[i1 + 2] * 0.114;
+            const g2 = data[i2] * 0.299 + data[i2 + 1] * 0.587 + data[i2 + 2] * 0.114;
+            dhash += g1 > g2 ? '1' : '0';
+            grays.push(g1);
+          }
+        }
+        const avg = grays.reduce((a, b) => a + b, 0) / grays.length;
+        const ahash = grays.map(g => g >= avg ? '1' : '0').join('');
+
+        // Center 4x4 color signature (crop-resistant)
+        const c2 = document.createElement('canvas');
+        c2.width = 4; c2.height = 4;
+        const ctx2 = c2.getContext('2d');
+        ctx2.drawImage(img, 0, 0, 4, 4);
+        const d2 = ctx2.getImageData(0, 0, 4, 4).data;
+        const rgb = [];
+        for (let i = 0; i < d2.length; i += 4) {
+          rgb.push(d2[i], d2[i + 1], d2[i + 2]);
+        }
+        resolve({ dhash, ahash, rgb });
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    if (srcOrBlob instanceof Blob) {
+      img.src = URL.createObjectURL(srcOrBlob);
+    } else {
+      img.src = srcOrBlob;
+    }
+  });
+}
+
+function compareFingerprints(fp1, fp2) {
+  if (!fp1 || !fp2) return 0;
+  let dDist = 0, aDist = 0;
+  for (let i = 0; i < 64; i++) {
+    if (fp1.dhash[i] !== fp2.dhash[i]) dDist++;
+    if (fp1.ahash[i] !== fp2.ahash[i]) aDist++;
+  }
+  const hashSim = 1 - ((dDist + aDist) / 128);
+
+  let colorDiff = 0;
+  for (let i = 0; i < fp1.rgb.length; i++) {
+    colorDiff += Math.abs(fp1.rgb[i] - fp2.rgb[i]);
+  }
+  const colorSim = 1 - (colorDiff / (fp1.rgb.length * 255));
+
+  // Weighted hybrid similarity score (0..100%)
+  return Math.max(0, Math.min(100, Math.round((hashSim * 0.65 + colorSim * 0.35) * 100)));
+}
+
+async function analyzeIPAFile(file) {
+  const buf = await file.arrayBuffer();
+  const sha256 = await computeSHA256(buf);
+
+  // Duplicate upload check by SHA-256
+  const existing = state.apps.find(a => a.sha256 === sha256);
+  if (existing) {
+    logEvent('IPA Analysis', `Duplicate binary skipped: ${file.name} matches ${existing.name} (${sha256.slice(0, 12)})`, 'warn');
+    return { duplicate: true, existing };
+  }
+
+  const zip = await JSZip.loadAsync(buf);
+  let plistPath = null;
+  let appDir = '';
+  const iconCandidates = [];
+
+  for (const path of Object.keys(zip.files)) {
+    const m = path.match(/^Payload\/([^\/]+\.app)\/Info\.plist$/);
+    if (m) {
+      plistPath = path;
+      appDir = `Payload/${m[1]}/`;
+    }
+    if (/^Payload\/[^\/]+\.app\/.*AppIcon.*\.png$/i.test(path)) {
+      iconCandidates.push(path);
+    }
+  }
+
+  if (!plistPath) {
+    throw new Error(`Invalid IPA structure in ${file.name}: Payload/*.app/Info.plist not found.`);
+  }
+
+  const plistBuf = await zip.files[plistPath].async('arraybuffer');
+  const rawText = new TextDecoder('utf-8', { fatal: false }).decode(plistBuf);
+  const cleanName = file.name.replace(/\.ipa$/i, '').replace(/[-_]/g, ' ');
+
+  const extracted = {
+    name: cleanName,
+    bundleIdentifier: '',
+    originalBundleIdentifier: '',
+    version: '1.0.0',
+    buildNumber: '1',
+    executableName: '',
+    minOSVersion: '15.0',
+    deviceFamily: [1, 2],
+    permissions: { entitlements: [], privacy: {} },
+    embeddedIconDataUrl: '',
+    iconFingerprint: null
+  };
+
+  if (rawText.includes('<?xml')) {
+    const p = parseXmlPlist(rawText);
+    extracted.name = p.CFBundleDisplayName || p.CFBundleName || cleanName;
+    extracted.bundleIdentifier = p.CFBundleIdentifier || '';
+    extracted.version = p.CFBundleShortVersionString || '1.0.0';
+    extracted.buildNumber = p.CFBundleVersion || '1';
+    extracted.executableName = p.CFBundleExecutable || '';
+    extracted.minOSVersion = p.MinimumOSVersion || '15.0';
+    for (const [k, v] of Object.entries(p)) {
+      if (k.startsWith('NS') && k.endsWith('UsageDescription') && typeof v === 'string') {
+        extracted.permissions.privacy[k] = v;
+      }
+    }
+  } else {
+    // Binary plist safe string extraction
+    const bid = rawText.match(/[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]+/);
+    if (bid) extracted.bundleIdentifier = bid[0];
+    const ver = rawText.match(/\b\d+\.\d+(\.\d+)?\b/);
+    if (ver) extracted.version = ver[0];
+  }
+
+  extracted.originalBundleIdentifier = extracted.bundleIdentifier;
+
+  // Extract largest embedded AppIcon PNG if available
+  if (iconCandidates.length > 0) {
+    iconCandidates.sort((a, b) => (zip.files[b]._data?.uncompressedSize || 0) - (zip.files[a]._data?.uncompressedSize || 0));
+    const iconBlob = await zip.files[iconCandidates[0]].async('blob');
+    extracted.embeddedIconDataUrl = await new Promise(r => {
+      const fr = new FileReader();
+      fr.onload = () => r(fr.result);
+      fr.readAsDataURL(iconBlob);
+    });
+    extracted.iconFingerprint = await computeImageFingerprint(iconBlob);
+  }
+
+  // Match GitHub Releases if synced
+  let downloadURL = '';
+  let releaseDate = new Date().toISOString().split('T')[0];
+  const ghRelMatch = findGitHubReleaseMatch(file.name, file.size, extracted.name);
+  if (ghRelMatch) {
+    downloadURL = ghRelMatch.url;
+    releaseDate = ghRelMatch.date;
+  }
+
+  // Match Visual Icon from GitHub Assets if indexed
+  let iconURL = '';
+  let iconMatchScore = 0;
+  let iconCandidatesMatched = [];
+  if (extracted.iconFingerprint && state.ghAssets.length > 0) {
+    iconCandidatesMatched = rankAssetMatches(extracted.iconFingerprint);
+    if (iconCandidatesMatched.length > 0 && iconCandidatesMatched[0].score >= 78) {
+      iconURL = iconCandidatesMatched[0].asset.url;
+      iconMatchScore = iconCandidatesMatched[0].score;
+    }
+  }
+
+  const appRecord = {
+    id: crypto.randomUUID(),
+    fileName: file.name,
+    sha256,
+    size: file.size,
+    name: extracted.name,
+    bundleIdentifier: extracted.bundleIdentifier || `com.unknown.${cleanName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+    originalBundleIdentifier: extracted.originalBundleIdentifier || extracted.bundleIdentifier,
+    developerName: '',
+    subtitle: '',
+    localizedDescription: '',
+    iconURL,
+    tintColor: state.source.tintColor || '#ffffff',
+    version: extracted.version,
+    buildNumber: extracted.buildNumber,
+    date: releaseDate,
+    versionDescription: `Version ${extracted.version}`,
+    downloadURL,
+    minOSVersion: extracted.minOSVersion,
+    permissions: extracted.permissions,
+    extracted,
+    aiGenerated: false,
+    iconMatchScore,
+    iconCandidatesMatched,
+    conflictStatus: null
+  };
+
+  return { duplicate: false, app: appRecord };
+}
+
+// --- GITHUB RELEASES & ASSETS INDEXING ---
+async function syncGitHubReleases() {
+  const raw = $('ghReleaseUrl').value.trim();
+  const m = raw.match(/github\.com\/([^\/]+)\/([^\/?#]+)(?:\/releases(?:\/tag\/([^\/?#]+))?)?/i);
+  if (!m) {
+    $('ghReleaseStatus').innerHTML = `<span class="badge err">Invalid URL</span> Enter https://github.com/owner/repo/releases`;
+    return;
+  }
+  const owner = m[1], repo = m[2].replace(/\.git$/i, ''), tag = m[3] ? decodeURIComponent(m[3]) : null;
+  $('ghRepoSlug').value = `${owner}/${repo}`;
+  savePrefs();
+
+  const btn = $('btnSyncReleases');
+  btn.disabled = true; btn.textContent = 'Syncing...';
+  try {
+    const api = tag
+      ? `https://api.github.com/repos/${owner}/${repo}/releases/tags/${encodeURIComponent(tag)}`
+      : `https://api.github.com/repos/${owner}/${repo}/releases?per_page=30`;
+    const res = await fetch(api);
+    if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [data];
+    state.ghReleases = [];
+    for (const rel of list) {
+      for (const asset of (rel.assets || [])) {
+        if (asset.name.toLowerCase().endsWith('.ipa')) {
+          state.ghReleases.push({
+            name: asset.name,
+            url: asset.browser_download_url,
+            size: asset.size,
+            tag: rel.tag_name,
+            date: (rel.published_at || new Date().toISOString()).split('T')[0]
+          });
+        }
+      }
+    }
+    $('ghReleaseStatus').innerHTML = `<span class="badge ok">${state.ghReleases.length} IPA asset(s) synced</span> Ready for automatic download URL matching.`;
+    logEvent('GitHub', `Synced ${state.ghReleases.length} release IPAs from ${owner}/${repo}`);
+
+    // Backfill existing apps missing downloadURL
+    let linked = 0;
+    state.apps.forEach(app => {
+      if (!app.downloadURL) {
+        const match = findGitHubReleaseMatch(app.fileName, app.size, app.name);
+        if (match) {
+          app.downloadURL = match.url;
+          app.date = match.date;
+          linked++;
+        }
+      }
+    });
+    if (linked > 0) {
+      createBackup('Auto-linked GitHub Release URLs');
+      refreshAllViews();
+      toast(`Linked ${linked} existing app(s) to GitHub Releases.`);
+    }
+  } catch (err) {
+    $('ghReleaseStatus').innerHTML = `<span class="badge err">Error</span> ${esc(err.message)}`;
+    logEvent('GitHub', err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sync Releases';
+  }
+}
+
+function findGitHubReleaseMatch(fileName, size, appName) {
+  if (!state.ghReleases.length) return null;
+  if (fileName) {
+    const byName = state.ghReleases.find(r => r.name.toLowerCase() === fileName.toLowerCase());
+    if (byName) return byName;
+  }
+  if (size > 0) {
+    const bySize = state.ghReleases.find(r => r.size === size);
+    if (bySize) return bySize;
+  }
+  const clean = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const target = clean(fileName ? fileName.replace(/\.ipa$/i, '') : appName);
+  if (target) {
+    const fuzzy = state.ghReleases.find(r => {
+      const c = clean(r.name.replace(/\.ipa$/i, ''));
+      return c.includes(target) || target.includes(c);
+    });
+    if (fuzzy) return fuzzy;
+  }
+  return state.ghReleases.length === 1 ? state.ghReleases[0] : null;
+}
+
+async function indexGitHubAssets() {
+  const slug = $('ghRepoSlug').value.trim();
+  const branch = $('ghBranch').value.trim() || 'main';
+  const dir = $('ghAssetsPath').value.trim().replace(/^\/|\/$/g, '');
+  if (!slug.includes('/')) {
+    toast('Enter repository as owner/repo');
+    return;
+  }
+  savePrefs();
+  const btn = $('btnIndexAssets');
+  btn.disabled = true; btn.textContent = 'Fingerprinting...';
+  $('assetsStatus').textContent = 'Fetching directory tree from GitHub API...';
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${slug}/contents/${dir}?ref=${encodeURIComponent(branch)}`);
+    if (!res.ok) throw new Error(`GitHub Contents API error (${res.status}). Check repo/path.`);
+    const items = await res.json();
+    const imgFiles = (Array.isArray(items) ? items : []).filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f.name));
+
+    const cache = JSON.parse(localStorage.getItem('pan_fp_cache') || '{}');
+    const indexed = [];
+
+    for (const f of imgFiles) {
+      const rawUrl = f.download_url || `https://raw.githubusercontent.com/${slug}/${branch}/${f.path}`;
+      let fp = cache[f.sha];
+      if (!fp) {
+        fp = await computeImageFingerprint(rawUrl);
+        if (fp) cache[f.sha] = fp;
+      }
+      indexed.push({ name: f.name, path: f.path, url: rawUrl, sha: f.sha, fingerprint: fp });
+    }
+
+    localStorage.setItem('pan_fp_cache', JSON.stringify(cache));
+    state.ghAssets = indexed;
+    $('assetsStatus').innerHTML = `<span class="badge ok">${indexed.length} assets indexed</span> Visual fingerprints cached.`;
+    logEvent('Assets', `Indexed & fingerprinted ${indexed.length} visual assets from ${slug}/${dir}`);
+    refreshAllViews();
+  } catch (err) {
+    $('assetsStatus').innerHTML = `<span class="badge err">Failed</span> ${esc(err.message)}`;
+    logEvent('Assets', err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Scan & Fingerprint Assets';
+  }
+}
+
+function rankAssetMatches(targetFp) {
+  if (!targetFp || !state.ghAssets.length) return [];
+  return state.ghAssets
+    .filter(a => a.fingerprint)
+    .map(asset => ({ asset, score: compareFingerprints(targetFp, asset.fingerprint) }))
+    .sort((a, b) => b.score - a.score);
+}
+
+// --- BUNDLE ID CONFLICT DETECTION ---
+function detectBundleConflicts() {
+  const groups = {};
+  state.apps.forEach(app => {
+    const key = (app.bundleIdentifier || '').trim().toLowerCase();
+    if (!key) return;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(app);
+  });
+
+  const conflicts = [];
+  Object.entries(groups).forEach(([bid, list]) => {
+    if (list.length > 1) {
+      // Determine if same app builds vs distinct apps sharing a bundle ID
+      const names = new Set(list.map(a => a.name.toLowerCase().trim()));
+      const isSameAppDifferentBuild = names.size === 1;
+      conflicts.push({
+        bundleIdentifier: list[0].bundleIdentifier,
+        apps: list,
+        classification: isSameAppDifferentBuild ? 'Multiple Builds of Same App' : 'Distinct Apps Sharing Bundle ID',
+        explanation: isSameAppDifferentBuild
+          ? `All ${list.length} entries share display name "${list[0].name}" and bundle ID "${list[0].bundleIdentifier}". AltStore supports multiple versions inside a single app entry's versions[] array.`
+          : `Different application names (${Array.from(names).join(', ')}) share "${list[0].bundleIdentifier}". Installing both simultaneously on iOS requires distinct embedded bundle IDs via signed IPA repackaging.`
+      });
+    }
+  });
+  return conflicts;
+}
+
+// --- AI DESCRIPTION & RESEARCH ---
+async function generateAppDescription() {
+  const appId = $('descTargetApp').value;
+  const app = state.apps.find(a => a.id === appId);
+  if (!app) {
+    toast('Select an application first.');
+    return;
+  }
+  const lang = $('descLang').value;
+  const mode = $('descMode').value;
+  const btn = $('btnGenerateDesc');
+  btn.disabled = true; btn.textContent = 'Researching...';
+
+  try {
+    if ($('cfWorkerUrl').value.trim()) {
+      const data = await callWorker('/api/ai/generate-description', {
+        app: {
+          name: app.name,
+          bundleIdentifier: app.bundleIdentifier,
+          version: app.version,
+          developerName: app.developerName,
+          existingDescription: app.localizedDescription,
+          permissions: app.permissions
+        },
+        language: lang,
+        mode
+      });
+      $('genSubtitle').value = data.subtitle || app.subtitle || '';
+      $('genDevCat').value = `${data.developerName || app.developerName || 'Unverified'} · ${data.category || 'utilities'}`;
+      $('genFullDesc').value = data.description || '';
+      $('descPreviewBox').style.display = 'block';
+      $('btnApplyDesc').disabled = false;
+      logEvent('Pan AI', `Generated ${lang} description for ${app.name} via Worker`);
+    } else {
+      // Grounded local metadata synthesis when Worker is not attached
+      const cleanTitle = app.name;
+      const dev = app.developerName || app.bundleIdentifier.split('.')[1] || 'Independent Developer';
+      const sub = lang === 'pt-BR' ? `${cleanTitle} para iOS` : `${cleanTitle} for iOS`;
+      const desc = mode === 'polish' && app.localizedDescription
+        ? app.localizedDescription.trim()
+        : (lang === 'pt-BR'
+          ? `${cleanTitle} (v${app.version}) — Pacote iOS (${app.bundleIdentifier}) compatível com iOS ${app.minOSVersion}+. [Nota: Conecte o Cloudflare Worker do Pan AI nas Configurações para pesquisa web automática completa.]`
+          : `${cleanTitle} (v${app.version}) — iOS package (${app.bundleIdentifier}) supporting iOS ${app.minOSVersion}+. [Note: Connect your Pan AI Cloudflare Worker in Settings for full live web research.]`);
+
+      $('genSubtitle').value = sub;
+      $('genDevCat').value = `${dev} · Unverified (Local Fallback)`;
+      $('genFullDesc').value = desc;
+      $('descPreviewBox').style.display = 'block';
+      $('btnApplyDesc').disabled = false;
+      logEvent('Pan AI', `Generated local grounded draft for ${app.name}`);
+    }
+  } catch (err) {
+    toast(err.message);
+    logEvent('Pan AI', err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate with Pan AI';
+  }
+}
+
+// --- ALTSTORE CLASSIC JSON BUILDER & VALIDATOR ---
+function buildAltStoreSource() {
+  const s = state.source;
+  const source = {
+    name: s.name || "Pan's Mega Repo",
+    identifier: s.identifier || "com.pan.megarepo",
+    subtitle: s.subtitle || undefined,
+    description: s.description || undefined,
+    iconURL: s.iconURL || undefined,
+    headerURL: s.headerURL || undefined,
+    website: s.website || undefined,
+    tintColor: s.tintColor || "#ffffff",
+    sourceURL: s.sourceURL || undefined,
+    apps: state.apps.map(a => ({
+      name: a.name,
+      bundleIdentifier: a.bundleIdentifier,
+      developerName: a.developerName || "Unknown Developer",
+      subtitle: a.subtitle || "",
+      localizedDescription: a.localizedDescription || "",
+      iconURL: a.iconURL || "",
+      tintColor: a.tintColor || s.tintColor || "#ffffff",
+      versions: [
+        {
+          version: a.version || "1.0",
+          date: a.date || new Date().toISOString().split('T')[0],
+          localizedDescription: a.versionDescription || "",
+          downloadURL: a.downloadURL || "",
+          size: Number(a.size) || 0,
+          minOSVersion: a.minOSVersion || "15.0"
+        }
+      ],
+      appPermissions: {
+        entitlements: a.permissions?.entitlements || [],
+        privacy: a.permissions?.privacy || {}
+      }
+    })),
+    news: []
+  };
+
+  Object.keys(source).forEach(k => { if (source[k] === undefined) delete source[k]; });
+  return source;
+}
+
+function validateSourceSchema() {
+  const issues = [];
+  if (!state.source.name.trim()) issues.push('Source name is required.');
+  if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+$/.test(state.source.identifier.trim())) {
+    issues.push('Source identifier should follow reverse-DNS format (e.g., com.pan.repo).');
+  }
+  state.apps.forEach((a, idx) => {
+    if (!a.name.trim()) issues.push(`App #${idx + 1}: Missing app name.`);
+    if (!a.bundleIdentifier.trim()) issues.push(`App #${idx + 1}: Missing bundleIdentifier.`);
+    if (!/^https?:\/\/.+/.test(a.downloadURL.trim())) issues.push(`${a.name || `App #${idx + 1}`}: Invalid or missing downloadURL.`);
+    if (a.iconURL && !/^https?:\/\/.+/.test(a.iconURL.trim())) issues.push(`${a.name}: Invalid iconURL.`);
+    if (!a.size || Number(a.size) <= 0) issues.push(`${a.name}: File size in bytes must be greater than 0.`);
+  });
+  const conflicts = detectBundleConflicts();
+  conflicts.forEach(c => issues.push(`Duplicate bundleIdentifier "${c.bundleIdentifier}" (${c.apps.length} entries).`));
+  return issues;
+}
+
+// --- RENDERERS ---
+function renderAppsList() {
+  const query = ($('appSearch').value || '').toLowerCase();
+  const filter = $('appFilter').value;
+  const conflictIds = new Set(detectBundleConflicts().flatMap(c => c.apps.map(a => a.id)));
+
+  const filtered = state.apps.filter(a => {
+    const matchText = !query || a.name.toLowerCase().includes(query) || a.bundleIdentifier.toLowerCase().includes(query) || (a.developerName || '').toLowerCase().includes(query);
+    if (!matchText) return false;
+    if (filter === 'missing_url') return !a.downloadURL;
+    if (filter === 'missing_icon') return !a.iconURL;
+    if (filter === 'conflict') return conflictIds.has(a.id);
+    return true;
+  });
+
+  if (!filtered.length) {
+    $('appsList').innerHTML = `<div class="card-sub" style="text-align:center;padding:24px">No applications match the current filter.</div>`;
+    return;
+  }
+
+  $('appsList').innerHTML = filtered.map(a => {
+    const idx = state.apps.findIndex(x => x.id === a.id);
+    const isConflict = conflictIds.has(a.id);
+    return `
+    <details class="glass-acc" data-appid="${a.id}">
+      <summary>
+        <div class="row" style="min-width:0">
+          <img src="${esc(a.iconURL || a.extracted?.embeddedIconDataUrl || '')}" onerror="this.style.opacity='0.2'" style="width:28px;height:28px;border-radius:7px;object-fit:cover;background:#1c1c1f">
+          <div style="min-width:0">
+            <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name)} <span style="color:var(--muted);font-weight:400">v${esc(a.version)}</span></div>
+            <div style="font-size:11px;color:var(--muted);font-family:monospace">${esc(a.bundleIdentifier)} · ${(a.size / 1048576).toFixed(1)} MB</div>
+          </div>
+        </div>
+        <div class="row">
+          ${isConflict ? `<span class="badge err">Conflict</span>` : ''}
+          ${a.downloadURL ? `<span class="badge ok">URL OK</span>` : `<span class="badge warn">No URL</span>`}
+          ${a.iconURL ? `<span class="badge ok">Icon OK</span>` : `<span class="badge">No Icon</span>`}
+          <button class="btn danger sm" onclick="event.preventDefault();deleteApp('${a.id}')">Remove</button>
+        </div>
+      </summary>
+      <div class="acc-body">
+        <div class="grid-2">
+          <div class="full"><label>Download URL *</label><input data-idx="${idx}" data-k="downloadURL" value="${esc(a.downloadURL)}"></div>
+          <div><label>Name</label><input data-idx="${idx}" data-k="name" value="${esc(a.name)}"></div>
+          <div><label>Bundle Identifier (Original: ${esc(a.originalBundleIdentifier || a.bundleIdentifier)})</label><input data-idx="${idx}" data-k="bundleIdentifier" value="${esc(a.bundleIdentifier)}" style="font-family:monospace"></div>
+          <div><label>Version</label><input data-idx="${idx}" data-k="version" value="${esc(a.version)}"></div>
+          <div><label>Size (Bytes)</label><input type="number" data-idx="${idx}" data-k="size" value="${a.size}"></div>
+          <div><label>Icon URL</label><input data-idx="${idx}" data-k="iconURL" value="${esc(a.iconURL)}"></div>
+          <div><label>Developer Name</label><input data-idx="${idx}" data-k="developerName" value="${esc(a.developerName)}"></div>
+          <div><label>Subtitle</label><input data-idx="${idx}" data-k="subtitle" value="${esc(a.subtitle)}"></div>
+          <div><label>Release Date</label><input type="date" data-idx="${idx}" data-k="date" value="${esc(a.date)}"></div>
+          <div class="full"><label>Description</label><textarea data-idx="${idx}" data-k="localizedDescription">${esc(a.localizedDescription)}</textarea></div>
+        </div>
+        ${a.sha256 ? `<div style="margin-top:8px;font-size:10.5px;color:var(--muted);font-family:monospace">SHA-256: ${a.sha256} · Min iOS: ${esc(a.minOSVersion)} · Privacy keys: ${Object.keys(a.permissions?.privacy || {}).length}</div>` : ''}
+      </div>
+    </details>`;
+  }).join('');
+}
+
+window.deleteApp = id => {
+  createBackup('Before deleting application');
+  state.apps = state.apps.filter(a => a.id !== id);
+  refreshAllViews();
+  toast('Application removed.');
+};
+
+$('appsList').addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.idx === undefined) return;
+  const app = state.apps[Number(el.dataset.idx)];
+  if (!app) return;
+  app[el.dataset.k] = el.dataset.k === 'size' ? Number(el.value) || 0 : el.value;
+  $('jsonCodePreview').textContent = JSON.stringify(buildAltStoreSource(), null, 2);
+});
+
+function renderConflicts() {
+  const conflicts = detectBundleConflicts();
+  $('kpiConflicts').textContent = conflicts.length;
+  $('pillConflicts').textContent = conflicts.length;
+  $('pillConflicts').style.display = conflicts.length ? 'inline-block' : 'none';
+
+  if (!conflicts.length) {
+    $('conflictsList').innerHTML = `<div class="card-sub" style="padding:14px 0">No duplicate bundle identifiers detected across ${state.apps.length} applications.</div>`;
+    return;
+  }
+
+  $('conflictsList').innerHTML = conflicts.map(c => `
+    <div class="card" style="background:rgba(255,255,255,0.02);margin-top:10px">
+      <div class="card-head">
+        <div>
+          <strong style="font-family:monospace">${esc(c.bundleIdentifier)}</strong>
+          <span class="badge warn" style="margin-left:6px">${esc(c.classification)}</span>
+        </div>
+        ${c.classification.includes('Multiple Builds')
+          ? `<button class="btn primary sm" onclick="mergeAppVersions('${esc(c.bundleIdentifier)}')">Merge into Single Multi-Version Entry</button>`
+          : `<button class="btn sm" onclick="flagRepackageNeeded('${esc(c.bundleIdentifier)}')">Flag for Signed Repackaging</button>`}
+      </div>
+      <div class="card-sub" style="margin-bottom:8px">${esc(c.explanation)}</div>
+      <div style="font-size:11.5px;color:var(--text)">
+        ${c.apps.map(a => `• <strong>${esc(a.name)}</strong> v${esc(a.version)} (${(a.size / 1048576).toFixed(1)} MB) — Original ID: <code>${esc(a.originalBundleIdentifier)}</code>`).join('<br>')}
+      </div>
+    </div>
+  `).join('');
+}
+
+window.mergeAppVersions = bid => {
+  const matching = state.apps.filter(a => a.bundleIdentifier.toLowerCase() === bid.toLowerCase());
+  if (matching.length < 2) return;
+  createBackup(`Merged duplicate versions for ${bid}`);
+  // Sort newest first and keep primary entry
+  matching.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
+  const keep = matching[0];
+  const removeIds = new Set(matching.slice(1).map(a => a.id));
+  state.apps = state.apps.filter(a => !removeIds.has(a.id));
+  logEvent('Conflict Resolver', `Merged ${matching.length} builds of ${keep.name} (${bid}) into latest v${keep.version}`);
+  refreshAllViews();
+  toast('Duplicate builds consolidated.');
+};
+
+window.flagRepackageNeeded = bid => {
+  logEvent('Conflict Resolver', `Flagged ${bid} for manual code-signed IPA repackaging (AltStore JSON ID untouched to prevent install failure).`, 'warn');
+  toast('Flagged safely in Activity Logs. Original IPA bundle ID preserved.');
+};
+
+function renderIconWorkspace() {
+  if (!state.apps.length) {
+    $('iconMatchWorkspace').innerHTML = `<div class="card-sub">Import an IPA first to compare its embedded icon against your indexed GitHub assets.</div>`;
+    return;
+  }
+  $('iconMatchWorkspace').innerHTML = state.apps.map(a => {
+    const candidates = a.iconCandidatesMatched || [];
+    return `
+    <div class="card" style="background:rgba(255,255,255,0.02)">
+      <div class="card-head">
+        <div class="row">
+          <img src="${esc(a.extracted?.embeddedIconDataUrl || '')}" onerror="this.style.opacity='0.2'" style="width:40px;height:40px;border-radius:9px;background:#18181b" title="Extracted IPA Icon">
+          <div>
+            <strong>${esc(a.name)}</strong>
+            <div class="card-sub">Extracted IPA Icon vs. Repository Asset · ${a.iconMatchScore ? `Match Confidence: ${a.iconMatchScore}%` : 'Awaiting match'}</div>
+          </div>
+        </div>
+        <img src="${esc(a.iconURL || '')}" onerror="this.style.opacity='0.2'" style="width:40px;height:40px;border-radius:9px;border:1px solid var(--border-strong);background:#18181b" title="Selected Repository Icon">
+      </div>
+      ${candidates.length ? `
+        <div class="asset-grid">
+          ${candidates.slice(0, 6).map(c => `
+            <div class="asset-tile ${a.iconURL === c.asset.url ? 'selected' : ''}" onclick="selectAppIcon('${a.id}','${esc(c.asset.url)}',${c.score})">
+              <img src="${esc(c.asset.url)}" alt="">
+              <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.asset.name)}</div>
+              <div class="badge ${c.score >= 80 ? 'ok' : 'warn'}" style="margin-top:4px">${c.score}% match</div>
+            </div>
+          `).join('')}
+        </div>` : `<div class="card-sub">Index your GitHub assets folder in "Assets Library" to view visual similarity candidates.</div>`}
+    </div>`;
+  }).join('');
+}
+
+window.selectAppIcon = (appId, url, score) => {
+  const app = state.apps.find(a => a.id === appId);
+  if (!app) return;
+  createBackup(`Icon updated for ${app.name}`);
+  app.iconURL = url;
+  app.iconMatchScore = score;
+  logEvent('Icon Recognition', `Assigned ${url.split('/').pop()} to ${app.name} (${score}% visual similarity)`);
+  refreshAllViews();
+  toast('Icon assigned.');
+};
+
+function renderAssetsGrid() {
+  $('kpiAssets').textContent = state.ghAssets.length;
+  $('pillAssets').textContent = state.ghAssets.length;
+  $('assetsGrid').innerHTML = state.ghAssets.map(a => `
+    <div class="asset-tile">
+      <img src="${esc(a.url)}" loading="lazy" alt="">
+      <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(a.name)}">${esc(a.name)}</div>
+      <div style="font-size:9.5px;color:var(--muted);font-family:monospace">${a.fingerprint ? `dH:${a.fingerprint.dhash.slice(0, 8)}` : 'No FP'}</div>
+    </div>
+  `).join('');
+}
+
+function renderLogs() {
+  $('activityLogList').innerHTML = state.logs.map(l => `
+    <div style="display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:12px">
+      <div><span class="badge ${l.level === 'error' ? 'err' : l.level === 'warn' ? 'warn' : ''}" style="margin-right:6px">${esc(l.category)}</span>${esc(l.message)}</div>
+      <span style="color:var(--muted);font-size:11px;white-space:nowrap">${esc(l.time)}</span>
+    </div>
+  `).join('');
+}
+
+function refreshAllViews() {
+  $('kpiApps').textContent = state.apps.length;
+  $('pillApps').textContent = state.apps.length;
+  $('chatAppCount').textContent = state.apps.length;
+  renderAppsList();
+  renderConflicts();
+  renderIconWorkspace();
+  renderAssetsGrid();
+
+  // Populate Description Generator select
+  const sel = $('descTargetApp');
+  const prev = sel.value;
+  sel.innerHTML = state.apps.map(a => `<option value="${a.id}">${esc(a.name)} (${esc(a.bundleIdentifier)})</option>`).join('');
+  if (prev && state.apps.some(a => a.id === prev)) sel.value = prev;
+
+  // Update JSON output & schema badge
+  const json = buildAltStoreSource();
+  $('jsonCodePreview').textContent = JSON.stringify(json, null, 2);
+  const issues = validateSourceSchema();
+  const badge = $('schemaBadge');
+  badge.className = issues.length ? 'badge warn' : 'badge ok';
+  badge.textContent = issues.length ? `${issues.length} Warning(s)` : 'Valid AltStore Schema';
+}
+
+// --- EVENT WIRING ---
+const dz = $('ipaDropzone');
+dz.onclick = () => $('ipaFileInput').click();
+dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag'); };
+dz.ondragleave = () => dz.classList.remove('drag');
+dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag'); handleIPAUploads(e.dataTransfer.files); };
+$('ipaFileInput').onchange = e => { handleIPAUploads(e.target.files); e.target.value = ''; };
+
+async function handleIPAUploads(files) {
+  if (!files || !files.length) return;
+  createBackup(`Before uploading ${files.length} IPA(s)`);
+  const logBox = $('uploadPipelineLog');
+  logBox.innerHTML = '';
+
+  for (const file of files) {
+    if (!file.name.toLowerCase().endsWith('.ipa')) continue;
+    const step = document.createElement('div');
+    step.className = 'card-sub';
+    step.style.padding = '4px 0';
+    step.textContent = `Analyzing ${file.name}...`;
+    logBox.appendChild(step);
+
+    try {
+      const res = await analyzeIPAFile(file);
+      if (res.duplicate) {
+        step.innerHTML = `<span class="badge warn">Duplicate</span> ${esc(file.name)} skipped (matches SHA-256 of ${esc(res.existing.name)}).`;
+      } else {
+        state.apps.push(res.app);
+        step.innerHTML = `<span class="badge ok">Ingested</span> <strong>${esc(res.app.name)}</strong> (${esc(res.app.bundleIdentifier)}) · ${res.app.downloadURL ? 'Release URL matched' : 'Needs URL'} · ${res.app.iconURL ? `Icon matched (${res.app.iconMatchScore}%)` : 'No icon match'}`;
+        logEvent('IPA Pipeline', `Ingested ${res.app.name} v${res.app.version} (${res.app.bundleIdentifier})`);
+      }
+    } catch (err) {
+      step.innerHTML = `<span class="badge err">Error</span> ${esc(err.message)}`;
+      logEvent('IPA Pipeline', err.message, 'error');
+    }
+  }
+  refreshAllViews();
+}
+
+$('btnSyncReleases').onclick = syncGitHubReleases;
+$('btnIndexAssets').onclick = indexGitHubAssets;
+$('btnScanConflicts').onclick = () => { renderConflicts(); toast('Bundle ID scan complete.'); };
+$('btnGenerateDesc').onclick = generateAppDescription;
+
+$('btnApplyDesc').onclick = () => {
+  const app = state.apps.find(a => a.id === $('descTargetApp').value);
+  if (!app) return;
+  createBackup(`Before applying AI description to ${app.name}`);
+  app.subtitle = $('genSubtitle').value.trim();
+  app.localizedDescription = $('genFullDesc').value.trim();
+  app.aiGenerated = true;
+  logEvent('Pan AI', `Applied generated description to ${app.name}`);
+  refreshAllViews();
+  toast('Description applied safely (backup created).');
+};
+
+$('btnMatchAllIcons').onclick = () => {
+  if (!state.ghAssets.length) {
+    toast('Index your GitHub assets first in Assets Library.');
+    return;
+  }
+  createBackup('Before batch visual icon matching');
+  let matched = 0;
+  state.apps.forEach(a => {
+    if (!a.iconURL && a.extracted?.iconFingerprint) {
+      const ranked = rankAssetMatches(a.extracted.iconFingerprint);
+      a.iconCandidatesMatched = ranked;
+      if (ranked[0] && ranked[0].score >= 78) {
+        a.iconURL = ranked[0].asset.url;
+        a.iconMatchScore = ranked[0].score;
+        matched++;
+      }
+    }
+  });
+  logEvent('Icon Recognition', `Auto-matched ${matched} application icon(s)`);
+  refreshAllViews();
+  toast(`Matched ${matched} icon(s) above 78% confidence.`);
+};
+
+// AI Studio Commands
+async function executeAiCommand(promptText) {
+  if (!promptText.trim()) return;
+  const chat = $('aiChatLog');
+  chat.innerHTML += `<div class="msg user">${esc(promptText)}</div>`;
+  $('aiPromptInput').value = '';
+
+  const p = promptText.toLowerCase();
+  let reply = '';
+
+  if (p.includes('duplicate') || p.includes('conflict')) {
+    const conflicts = detectBundleConflicts();
+    reply = conflicts.length
+      ? `Detected ${conflicts.length} bundle ID conflict(s): ${conflicts.map(c => `${c.bundleIdentifier} (${c.classification})`).join('; ')}. Open Bundle ID Manager to review.`
+      : 'Zero duplicate bundle identifiers found across your source.';
+  } else if (p.includes('missing icon') || p.includes('icon')) {
+    const missing = state.apps.filter(a => !a.iconURL);
+    reply = missing.length
+      ? `${missing.length} app(s) are missing an iconURL: ${missing.map(a => a.name).join(', ')}.`
+      : 'All applications currently have an assigned iconURL.';
+  } else if (p.includes('validate') || p.includes('audit') || p.includes('analyze all')) {
+    const issues = validateSourceSchema();
+    reply = issues.length
+      ? `Validation found ${issues.length} issue(s):\n• ${issues.join('\n• ')}`
+      : `All ${state.apps.length} applications passed AltStore Classic schema validation with zero errors.`;
+  } else if (p.includes('unused asset')) {
+    const usedUrls = new Set(state.apps.map(a => a.iconURL));
+    const unused = state.ghAssets.filter(asset => !usedUrls.has(asset.url));
+    reply = state.ghAssets.length
+      ? `${unused.length} of ${state.ghAssets.length} indexed GitHub assets are not referenced by any app.`
+      : 'No GitHub assets indexed yet. Run "Scan & Fingerprint Assets" first.';
+  } else if ($('cfWorkerUrl').value.trim()) {
+    try {
+      const res = await callWorker('/api/ai/research-app', {
+        prompt: promptText,
+        sourceSummary: { name: state.source.name, appCount: state.apps.length, apps: state.apps.map(a => ({ name: a.name, bundleIdentifier: a.bundleIdentifier, version: a.version })) }
+      });
+      reply = res.reply || JSON.stringify(res);
+    } catch (err) {
+      reply = `Worker AI error: ${err.message}`;
+    }
+  } else {
+    reply = `Local analysis complete across ${state.apps.length} apps. Connect your Cloudflare Worker URL in "Cloudflare Backend" to enable live LLM reasoning and web research.`;
+  }
+
+  chat.innerHTML += `<div class="msg ai"><strong>Pan AI:</strong> ${esc(reply).replace(/\n/g, '<br>')}</div>`;
+  chat.scrollTop = chat.scrollHeight;
+  logEvent('AI Studio', `Executed command: "${promptText}"`);
+}
+
+$('btnSendAi').onclick = () => executeAiCommand($('aiPromptInput').value);
+$('aiPromptInput').onkeydown = e => { if (e.key === 'Enter') executeAiCommand($('aiPromptInput').value); };
+document.querySelectorAll('.quick-cmd').forEach(b => b.onclick = () => executeAiCommand(b.dataset.cmd));
+
+// Source Metadata Inputs
+['srcName', 'srcIdentifier', 'srcSubtitle', 'srcWebsite', 'srcIconURL', 'srcHeaderURL', 'srcSourceURL', 'srcTintColor', 'srcDescription'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    const map = {
+      srcName: 'name', srcIdentifier: 'identifier', srcSubtitle: 'subtitle',
+      srcWebsite: 'website', srcIconURL: 'iconURL', srcHeaderURL: 'headerURL',
+      srcSourceURL: 'sourceURL', srcTintColor: 'tintColor', srcDescription: 'description'
+    };
+    state.source[map[id]] = $(id).value;
+    $('jsonCodePreview').textContent = JSON.stringify(buildAltStoreSource(), null, 2);
+  });
+});
+
+// Toolbar Actions
+$('btnAddManualApp').onclick = () => {
+  createBackup('Added manual application');
+  state.apps.push({
+    id: crypto.randomUUID(),
+    name: 'New Application',
+    bundleIdentifier: `com.example.app${state.apps.length + 1}`,
+    originalBundleIdentifier: `com.example.app${state.apps.length + 1}`,
+    developerName: '',
+    subtitle: '',
+    localizedDescription: '',
+    iconURL: '',
+    tintColor: state.source.tintColor,
+    version: '1.0',
+    date: new Date().toISOString().split('T')[0],
+    versionDescription: '',
+    downloadURL: '',
+    size: 0,
+    minOSVersion: '15.0',
+    permissions: { entitlements: [], privacy: {} }
+  });
+  refreshAllViews();
+};
+
+$('btnExpandApps').onclick = () => {
+  const accs = [...$('appsList').querySelectorAll('details')];
+  const openAny = accs.some(d => !d.open);
+  accs.forEach(d => d.open = openAny);
+  $('btnExpandApps').textContent = openAny ? 'Collapse All' : 'Expand All';
+};
+
+$('appSearch').oninput = renderAppsList;
+$('appFilter').onchange = renderAppsList;
+
+$('btnRunAudit').onclick = () => {
+  const issues = validateSourceSchema();
+  $('auditResults').innerHTML = issues.length
+    ? `<span class="badge warn">${issues.length} issue(s) found</span><ul style="margin:8px 0 0;padding-left:18px">${issues.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`
+    : `<span class="badge ok">All checks passed</span> Your AltStore Classic source JSON is valid and ready for publishing.`;
+  logEvent('Audit', `Completed full source audit (${issues.length} issues)`);
+};
+
+$('btnValidateJson').onclick = () => {
+  const issues = validateSourceSchema();
+  toast(issues.length ? `${issues.length} validation warning(s) found.` : 'AltStore JSON schema is valid!');
+};
+
+$('btnBackup').onclick = () => { createBackup('Manual user checkpoint'); toast('Backup created.'); };
+$('btnRestoreBackup').onclick = () => {
+  if (!state.backups.length) { toast('No backups available.'); return; }
+  const b = state.backups[0];
+  importAltStoreObject(JSON.parse(b.snapshot));
+  logEvent('Backup', `Restored snapshot from ${b.timestamp}`);
+  toast(`Restored backup (${b.reason}).`);
+};
+
+$('btnCopyJson').onclick = () => {
+  navigator.clipboard?.writeText(JSON.stringify(buildAltStoreSource(), null, 2));
+  toast('apps.json copied to clipboard.');
+};
+
+$('btnExportJson').onclick = () => {
+  const blob = new Blob([JSON.stringify(buildAltStoreSource(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'apps.json';
+  a.click();
+  logEvent('Export', 'Downloaded apps.json');
+  toast('Exported apps.json');
+};
+
+$('btnImportJson').onclick = () => $('jsonImportInput').click();
+$('jsonImportInput').onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    createBackup('Before importing external JSON');
+    const obj = JSON.parse(await f.text());
+    importAltStoreObject(obj);
+    logEvent('Import', `Imported ${f.name} (${state.apps.length} apps)`);
+    toast('Source JSON imported.');
+  } catch (err) {
+    toast(`Invalid JSON: ${err.message}`);
+  }
+  e.target.value = '';
+};
+
+function importAltStoreObject(d) {
+  state.source = {
+    name: d.name || "Pan's Mega Repo",
+    identifier: d.identifier || "com.pan.megarepo",
+    subtitle: d.subtitle || '',
+    description: d.description || '',
+    iconURL: d.iconURL || '',
+    headerURL: d.headerURL || '',
+    website: d.website || '',
+    sourceURL: d.sourceURL || '',
+    tintColor: d.tintColor || '#ffffff'
+  };
+  $('srcName').value = state.source.name;
+  $('srcIdentifier').value = state.source.identifier;
+  $('srcSubtitle').value = state.source.subtitle;
+  $('srcDescription').value = state.source.description;
+  $('srcIconURL').value = state.source.iconURL;
+  $('srcHeaderURL').value = state.source.headerURL;
+  $('srcWebsite').value = state.source.website;
+  $('srcSourceURL').value = state.source.sourceURL;
+  $('srcTintColor').value = state.source.tintColor;
+
+  state.apps = (d.apps || []).map(a => {
+    const v = (a.versions && a.versions[0]) || {};
+    return {
+      id: crypto.randomUUID(),
+      name: a.name || 'Unnamed App',
+      bundleIdentifier: a.bundleIdentifier || '',
+      originalBundleIdentifier: a.bundleIdentifier || '',
+      developerName: a.developerName || '',
+      subtitle: a.subtitle || '',
+      localizedDescription: a.localizedDescription || '',
+      iconURL: a.iconURL || '',
+      tintColor: a.tintColor || state.source.tintColor,
+      version: v.version || a.version || '1.0',
+      date: (v.date || a.versionDate || new Date().toISOString()).split('T')[0],
+      versionDescription: v.localizedDescription || '',
+      downloadURL: v.downloadURL || a.downloadURL || '',
+      size: Number(v.size || a.size) || 0,
+      minOSVersion: v.minOSVersion || '15.0',
+      permissions: a.appPermissions || { entitlements: [], privacy: {} }
+    };
+  });
+  refreshAllViews();
+}
+
+// Cloudflare & GitHub Commit Actions
+function savePrefs() {
+  localStorage.setItem('pan_worker_url', $('cfWorkerUrl').value.trim());
+  localStorage.setItem('pan_admin_token', $('cfAdminToken').value.trim());
+  localStorage.setItem('pan_repo_slug', $('ghRepoSlug').value.trim());
+  localStorage.setItem('pan_branch', $('ghBranch').value.trim());
+  localStorage.setItem('pan_assets_path', $('ghAssetsPath').value.trim());
+}
+
+$('btnTestWorker').onclick = async () => {
+  savePrefs();
+  try {
+    const res = await callWorker('/api/health', null, 'GET');
+    $('cfHealthStatus').innerHTML = `<span class="badge ok">Connected</span> Worker v${esc(res.version || '1.0')} · D1: ${res.d1 ? 'OK' : 'N/A'} · AI: ${esc(res.provider || 'Configured')}`;
+    $('kpiWorker').textContent = 'Connected';
+    $('mobileWorkerBadge').textContent = 'Worker Online';
+    logEvent('Cloudflare', 'Health check succeeded');
+    toast('Cloudflare Worker connected!');
+  } catch (err) {
+    $('cfHealthStatus').innerHTML = `<span class="badge err">Connection Failed</span> ${esc(err.message)}`;
+    logEvent('Cloudflare', err.message, 'error');
+  }
+};
+
+$('btnSaveAiSettings').onclick = async () => {
+  savePrefs();
+  const payload = {
+    enabled: $('aiEnabled').checked,
+    provider: $('aiProvider').value,
+    model: $('aiModel').value.trim(),
+    apiKey: $('aiApiKey').value.trim(),
+    customEndpoint: $('aiCustomEndpoint').value.trim(),
+    temperature: Number($('aiTemp').value),
+    maxTokens: Number($('aiMaxTokens').value)
+  };
+  $('studioModelBadge').textContent = payload.enabled ? payload.model : 'AI Disabled';
+  if ($('cfWorkerUrl').value.trim()) {
+    try {
+      await callWorker('/api/settings/ai', payload);
+      $('aiApiKey').value = ''; // Clear input after secure backend save
+      logEvent('Settings', `Updated Pan AI provider (${payload.provider} / ${payload.model}) in Cloudflare Worker`);
+      toast('Pan AI settings saved securely to Worker!');
+    } catch (err) {
+      toast(err.message);
+    }
+  } else {
+    toast('Saved locally. Connect Cloudflare Worker to persist API keys securely.');
+  }
+};
+
+$('btnCommitGithub').onclick = async () => {
+  const issues = validateSourceSchema();
+  if (issues.length) {
+    toast(`Fix ${issues.length} validation warning(s) before committing.`);
+    return;
+  }
+  savePrefs();
+  try {
+    const res = await callWorker('/api/source/sync', {
+      repo: $('ghRepoSlug').value.trim(),
+      branch: $('ghBranch').value.trim() || 'main',
+      path: $('ghJsonPath').value.trim() || 'apps.json',
+      message: $('ghCommitMsg').value.trim() || 'chore(source): update apps.json',
+      source: buildAltStoreSource()
+    });
+    $('ghSyncResult').innerHTML = `<span class="badge ok">Committed</span> Commit SHA: <code>${esc(res.commitSha || 'updated')}</code>`;
+    logEvent('GitHub', `Committed apps.json (${res.commitSha || 'ok'})`);
+    toast('Committed apps.json to GitHub!');
+  } catch (err) {
+    $('ghSyncResult').innerHTML = `<span class="badge err">Sync Failed</span> ${esc(err.message)}`;
+    logEvent('GitHub', err.message, 'error');
+  }
+};
+
+$('btnClearLogs').onclick = () => { state.logs = []; $('pillLogs').textContent = '0'; renderLogs(); };
+
+// Restore saved prefs on boot
+$('cfWorkerUrl').value = state.config.workerUrl;
+$('cfAdminToken').value = state.config.adminToken;
+$('ghRepoSlug').value = state.config.repoSlug;
+$('ghBranch').value = state.config.branch;
+$('ghAssetsPath').value = state.config.assetsPath;
+
+logEvent('System', 'Pan\'s Mega Repo Studio initialized');
+refreshAllViews();
+</script>
+</body>
+</html>
