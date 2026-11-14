@@ -103,7 +103,7 @@
     },
     {
       "name": "Spotify",
-      "bundleIdentifier": "com.spotify.client",
+      "bundleIdentifier": "com.vitrine.client",
       "developerName": "",
       "subtitle": "",
       "localizedDescription": "",
