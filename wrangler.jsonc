@@ -1,0 +1,36 @@
+{
+"$schema": "node_modules/wrangler/config-schema.json",
+"name": "pans-mega-repo-api",
+"main": "worker.js",
+"compatibility_date": "2026-11-01",
+"observability": {
+"enabled": true
+},
+"vars": {
+"DEFAULT_AI_PROVIDER": "gemini"
+},
+"d1_databases": [
+{
+"binding": "DB",
+"database_name": "pans_mega_repo_db",
+"database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+}
+],
+"kv_namespaces": [
+{
+"binding": "KV",
+"id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+}
+],
+"r2_buckets": [
+{
+"binding": "R2",
+"bucket_name": "pans-mega-repo-ipas"
+}
+],
+"triggers": {
+"crons": [
+"0 */6 * * *"
+]
+}
+}
