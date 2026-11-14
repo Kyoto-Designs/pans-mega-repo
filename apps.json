@@ -1,9 +1,175 @@
 {
-  "name": "Pan’s Mega Repo",
-  "subtitle": "A curated collection of apps for AltStore Classic.",
-  "description": "Welcome to Pan’s Mega Repo. Apps will be added here as they are reviewed and prepared for distribution.",
-  "iconURL": "https://kyoto-designs.github.io/pans-mega-repo/assets/icon.png",
-  "tintColor": "#202020",
-  "apps": [],
+  "name": "Pan's Mega Repo",
+  "identifier": "com.pan.megarepo",
+  "subtitle": "Version 1",
+  "description": "Best apps selected for you!",
+  "iconURL": "https://github.com/Kyoto-Designs/pans-mega-repo/blob/main/assets/icon.png?raw=true",
+  "headerURL": "https://github.com/Kyoto-Designs/pans-mega-repo/blob/main/assets/icon.png?raw=true",
+  "website": "https://github.com/Kyoto-Designs",
+  "tintColor": "#2e063d",
+  "sourceURL": "https://raw.githubusercontent.com/Kyoto-Designs/pans-mega-repo/refs/heads/main/apps.json",
+  "apps": [
+    {
+      "name": "SideStore",
+      "bundleIdentifier": "com.apple.itunes.ipaYSideStore",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "0.7.0",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/SideStore.ipa",
+          "size": 31137651,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "ChatGBT",
+      "bundleIdentifier": "ChatGBT",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "0.1",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/ChatGBT.ipa",
+          "size": 390666,
+          "minOSVersion": "15.8.5"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "Ksign",
+      "bundleIdentifier": "com.apple.compilers.llvm.clang.1",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "0.1",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/Ksign.ipa",
+          "size": 16394645,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "TikTok",
+      "bundleIdentifier": "com.zhiliaoapp.musically",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "47.6.0",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/gtok.2.6.1.ipa",
+          "size": 505731257,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "Spotify",
+      "bundleIdentifier": "com.spotify.client",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "9.1.90",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/1254-Spotify.9.1.90.Vitrine%2BPixie.%40ipavault.ipa",
+          "size": 130776379,
+          "minOSVersion": "16.1"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "Spotify",
+      "bundleIdentifier": "com.spotify.client",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "9.1.92",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/Spotify.9.1.92.EeveeSpotify%2BPixie.No.Plugins.ipa",
+          "size": 146362211,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "Delta",
+      "bundleIdentifier": "com.gloop.deltamobile",
+      "developerName": "",
+      "subtitle": "",
+      "localizedDescription": "",
+      "iconURL": "",
+      "tintColor": "#38bdf8",
+      "versions": [
+        {
+          "version": "2.741.1062",
+          "date": "2026-11-14",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/Kyoto-Designs/pans-mega-repo/releases/download/v0.1/Delta-2.741.1062.ipa",
+          "size": 144496835,
+          "minOSVersion": "14.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
   "news": []
 }
